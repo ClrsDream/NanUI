@@ -19,7 +19,7 @@ namespace NetDimension.NanUI.Resources {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Messages {
@@ -61,24 +61,6 @@ namespace NetDimension.NanUI.Resources {
         }
         
         /// <summary>
-        ///   查找类似 关闭(&amp;C) 的本地化字符串。
-        /// </summary>
-        internal static string AboutDialog_CloseButton {
-            get {
-                return ResourceManager.GetString("AboutDialog.CloseButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 关于 NanUI 界面框架 的本地化字符串。
-        /// </summary>
-        internal static string AboutDialog_Title {
-            get {
-                return ResourceManager.GetString("AboutDialog.Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 正在加载 的本地化字符串。
         /// </summary>
         internal static string Browser_Loading {
@@ -106,25 +88,7 @@ namespace NetDimension.NanUI.Resources {
         }
         
         /// <summary>
-        ///   查找类似 {0} 需要继承IHostWindow接口。 的本地化字符串。
-        /// </summary>
-        internal static string Exception_DoseNotImpementIHostWindow {
-            get {
-                return ResourceManager.GetString("Exception.DoseNotImpementIHostWindow", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 {0} 需要指定返回值。 的本地化字符串。
-        /// </summary>
-        internal static string Exception_HaveNoRetureValue {
-            get {
-                return ResourceManager.GetString("Exception.HaveNoRetureValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 WinFormium 承载窗体 的本地化字符串。
+        ///   查找类似 NanUI 承载窗体 的本地化字符串。
         /// </summary>
         internal static string HostWindow_DefaultTitle {
             get {
@@ -133,7 +97,7 @@ namespace NetDimension.NanUI.Resources {
         }
         
         /// <summary>
-        ///   查找类似 WinFormium 开发者工具箱 的本地化字符串。
+        ///   查找类似 NanUI 开发者工具箱 的本地化字符串。
         /// </summary>
         internal static string HostWindow_DevToolsTitle {
             get {
@@ -142,7 +106,16 @@ namespace NetDimension.NanUI.Resources {
         }
         
         /// <summary>
-        ///   查找类似 消息提示 的本地化字符串。
+        ///   查找类似 调用 JavaScript 失败。 的本地化字符串。
+        /// </summary>
+        internal static string JavaScript_InvokeFailed {
+            get {
+                return ResourceManager.GetString("JavaScript.InvokeFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 消息 的本地化字符串。
         /// </summary>
         internal static string JSDialog_AlertDialog_Title {
             get {
@@ -151,7 +124,7 @@ namespace NetDimension.NanUI.Resources {
         }
         
         /// <summary>
-        ///   查找类似 需要确认 的本地化字符串。
+        ///   查找类似 确认 的本地化字符串。
         /// </summary>
         internal static string JSDialog_ConfirmDialog_Title {
             get {
@@ -183,6 +156,15 @@ namespace NetDimension.NanUI.Resources {
         internal static string JSDialog_YesButton {
             get {
                 return ResourceManager.GetString("JSDialog.YesButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 未找到 CEF 支持文件。 的本地化字符串。
+        /// </summary>
+        internal static string Runtime_CefNotFound {
+            get {
+                return ResourceManager.GetString("Runtime.CefNotFound", resourceCulture);
             }
         }
         

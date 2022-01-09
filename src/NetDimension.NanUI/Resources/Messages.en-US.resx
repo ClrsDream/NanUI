@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -112,17 +112,11 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AboutDialog.CloseButton" xml:space="preserve">
-    <value>&amp;Close</value>
-  </data>
-  <data name="AboutDialog.Title" xml:space="preserve">
-    <value>About</value>
-  </data>
   <data name="Browser.Loading" xml:space="preserve">
     <value>Loading</value>
   </data>
@@ -132,17 +126,14 @@
   <data name="ContextMenu.ShowDevTools" xml:space="preserve">
     <value>Show &amp;DevTools</value>
   </data>
-  <data name="Exception.DoseNotImpementIHostWindow" xml:space="preserve">
-    <value>{0} should implement IHostWindow Interface.</value>
-  </data>
-  <data name="Exception.HaveNoRetureValue" xml:space="preserve">
-    <value>{0} should have a return value.</value>
-  </data>
   <data name="HostWindow.DefaultTitle" xml:space="preserve">
-    <value>WinFormium Host Window</value>
+    <value>NanUI Host Window</value>
   </data>
   <data name="HostWindow.DevToolsTitle" xml:space="preserve">
-    <value>WinFormium DevTools</value>
+    <value>NanUI Browser DevTools</value>
+  </data>
+  <data name="JavaScript.InvokeFailed" xml:space="preserve">
+    <value>Invoke JavaScript failed.</value>
   </data>
   <data name="JSDialog.AlertDialog.Title" xml:space="preserve">
     <value>Message</value>
@@ -158,6 +149,9 @@
   </data>
   <data name="JSDialog.YesButton" xml:space="preserve">
     <value>&amp;Yes</value>
+  </data>
+  <data name="Runtime.CefNotFound" xml:space="preserve">
+    <value>The CEF binary files are not found.</value>
   </data>
   <data name="SystemMenu.About" xml:space="preserve">
     <value>&amp;About</value>

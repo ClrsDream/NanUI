@@ -1,161 +1,68 @@
+﻿using NetDimension.Shiva;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Runtime.InteropServices;
+using System.Linq;
 using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Xilium.CefGlue;
+using static Vanara.PInvoke.User32;
 
 namespace NetDimension.NanUI.HostWindow
 {
-    internal partial class FakeClassToDisableWinFormDesigner
+    using System.Runtime.InteropServices;
+    using Vanara.PInvoke;
+
+    using static Vanara.PInvoke.DwmApi;
+    using static Vanara.PInvoke.User32;
+
+
+    public class AcrylicStyleHostWindow : SystemWindow, IFormiumHostWindow
     {
+        public WindowMessageDelegate OnWindowsMessage { get; set; }
 
-    }
-    public class AcrylicStyleHostWindow : BorderlessWindow, IFormiumHostWindow
-    {
+        public WindowMessageDelegate OnDefWindowsMessage { get; set; }
 
-        private CefBrowserHost BrowserHost => _formium?.Browser?.GetHost();
+        public Formium Formium { get; }
 
+        private CefBrowserHost BrowserHost => Formium?.Browser?.GetHost();
 
-
-        #region Common
-        private readonly SynchronizationContext _uiThread;
-        private readonly Formium _formium;
-
-        public OnWindowsMessageDelegate OnWindowsMessage { get; set; }
-
-        public OnWindowsMessageDelegate OnDefWindowsMessage { get; set; }
-        #endregion
-
-
-        protected override bool CanEnableIme => true;
-
-
-        private AcrylicStyleHostWindow()
+        public AcrylicStyleHostWindow(Formium formium)
         {
-            MinimumSize = new Size(200, 100);
-
-
-            BorderEffect = BorderEffect.None;
-
-            SetStyle(
-                 ControlStyles.UserPaint |
-                 ControlStyles.AllPaintingInWmPaint |
-                 ControlStyles.SupportsTransparentBackColor 
-
-            , true);
-
-
-        }
-
-
-
-        public AcrylicStyleHostWindow(Formium formium) : this()
-        {
-            _formium = formium;
-            
-            _uiThread = WindowsFormsSynchronizationContext.Current;
-
-
-            _formium.AllowFullScreen = false;
-
-
-        }
-
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            base.OnHandleCreated(e);
-
-            try
-            {
-                WindowUtils.EnableAcrylic(this);
-            }
-            catch(Exception ex)
-            {
-                WinFormium.GetLogger().Error(ex);
-            }
-            
-
-        }
-
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-
-            SystemDpiChanged += AcrylicStyleHostWindow_SystemDpiChanged;
-
-        }
-
-        private void AcrylicStyleHostWindow_SystemDpiChanged(object sender, WindowDpiChangedEventArgs e)
-        {
-            BrowserHost?.NotifyScreenInfoChanged();
-        }
-
-        public void PostUIThread(Action action)
-        {
-            _uiThread.Post(_state =>
-            {
-                action?.Invoke();
-            }, null);
+            Formium = formium;
         }
 
         protected override void WndProc(ref Message m)
         {
+            var handled = OnWindowsMessage?.Invoke(ref m) ?? false;
 
-            var msg = (WindowsMessages)m.Msg;
-
-
-            var handled = OnWindowsMessage?.Invoke(ref m);
+            var msg = (WindowMessage)m.Msg;
 
             switch (msg)
             {
-                case WindowsMessages.WM_LBUTTONDOWN:
-                    handled = _formium?.OnBrowserWMLButtonDown(m);
-                    break;
-                case WindowsMessages.WM_RBUTTONDOWN:
-                    handled = _formium?.OnBrowserWMRButtonDown(m);
-                    break;
-                case WindowsMessages.WM_RBUTTONUP:
-                    handled = _formium?.OnBrowserWMRButtonUp(m);
-                    break;
-                case WindowsMessages.WM_LBUTTONDBLCLK:
-                    handled = _formium?.OnBrowserWMLButtonDbClick(m);
-                    break;
-                case WindowsMessages.WM_MOUSEMOVE:
-                    if (_formium != null && _formium.Resizable)
-                    {
-                        handled = _formium.OnBrowserWMMouseMove(m);
-                    }
-                    break;
-                case WindowsMessages.WM_IME_STARTCOMPOSITION:
+
+                case WindowMessage.WM_IME_STARTCOMPOSITION:
                     {
 
                     }
                     break;
 
-                case WindowsMessages.WM_IME_ENDCOMPOSITION:
+                case WindowMessage.WM_IME_ENDCOMPOSITION:
                     {
 
                     }
                     break;
-                case WindowsMessages.WM_IME_COMPOSITION:
+                case WindowMessage.WM_IME_COMPOSITION:
                     {
 
                     }
                     break;
-                case WindowsMessages.WM_IME_SETCONTEXT:
-                    {
-                    }
-                    break;
+
 
             }
 
-
-
-            if (handled == null || handled == false)
+            if (!handled)
             {
                 base.WndProc(ref m);
             }
@@ -163,220 +70,105 @@ namespace NetDimension.NanUI.HostWindow
 
         protected override void DefWndProc(ref Message m)
         {
-            var retval = OnDefWindowsMessage?.Invoke(ref m);
+            if (m.Msg == (int)WindowMessage.WM_NCCALCSIZE && m.WParam != IntPtr.Zero)
+            {
+                if (IsZoomed(hWnd))
+                {
+                    var nccsp = Marshal.PtrToStructure<BorderlessWindow.NCCALCSIZE_PARAMS>(m.LParam);
+                    var ncBorders = GetNonClientAeraBorders();
+                    nccsp.rgrc1 = nccsp.rgrc0;
+                    nccsp.rgrc0.top -= ncBorders.Top;
+                    nccsp.rgrc0.top += ncBorders.Bottom;
+                    Marshal.StructureToPtr(nccsp, m.LParam, false);
+                    
+                    m.Result = (IntPtr)0x0400;
+                    //base.WndProc(ref m);
+                }
+                else
+                {
+                    m.Result = IntPtr.Zero;
+                }
 
-            if (retval == null || retval == false)
+                return;
+            }
+
+            var handled = OnDefWindowsMessage?.Invoke(ref m) ?? false;
+
+            if (!handled)
             {
                 base.DefWndProc(ref m);
             }
         }
 
-
         protected override CreateParams CreateParams
         {
             get
             {
-                var createParams = base.CreateParams;
-
-                createParams.ExStyle |= 0x00200000;
-
+                // Add the layered extended style (WS_EX_LAYERED) to this window.
+                CreateParams createParams = base.CreateParams;
+                createParams.ExStyle |= 0x0020_0000;
                 return createParams;
             }
         }
-
-
-        #region OSR Event handlers
-        private void GetPointInCurrentView(ref Point point)
+        protected override void OnHandleCreated(EventArgs e)
         {
-            point.X = (int)(point.X / ScaleFactor);
-            point.Y = (int)(point.Y / ScaleFactor);
-        }
+            base.OnHandleCreated(e);
 
-        private static CefEventFlags GetMouseModifiers(MouseButtons mouseButtons)
-        {
-            CefEventFlags modifiers = new CefEventFlags();
-
-            if (mouseButtons == MouseButtons.Left)
-                modifiers |= CefEventFlags.LeftMouseButton;
-
-            if (mouseButtons == MouseButtons.Middle)
-                modifiers |= CefEventFlags.MiddleMouseButton;
-
-            if (mouseButtons == MouseButtons.Right)
-                modifiers |= CefEventFlags.RightMouseButton;
-
-            return modifiers;
-        }
-
-        private static CefEventFlags GetKeyboardModifiers(Keys modifiers)
-        {
-            CefEventFlags result = new CefEventFlags();
-
-            if (modifiers == Keys.Alt)
-                result |= CefEventFlags.AltDown;
-
-            if (modifiers == Keys.Control)
-                result |= CefEventFlags.ControlDown;
-
-            if (modifiers == Keys.Shift)
-                result |= CefEventFlags.ShiftDown;
-
-            return result;
-        }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-
-            e.Handled = true;
-
-            BrowserHost?.SendKeyEvent(new CefKeyEvent
+            try
             {
-                EventType = CefKeyEventType.KeyDown,
-                WindowsKeyCode = (int)e.KeyCode,
-                Modifiers = GetKeyboardModifiers(e.Modifiers)
-            });
+                DwmSetWindowAttribute(hWnd, DWMWINDOWATTRIBUTE.DWMWA_NCRENDERING_POLICY, DWMNCRENDERINGPOLICY.DWMNCRP_ENABLED);
+
+                DwmExtendFrameIntoClientArea(hWnd, new MARGINS(0, 2, 0, 2));
 
 
-
-        }
-
-        protected override void OnKeyUp(KeyEventArgs e)
-        {
-            e.Handled = true;
-
-            BrowserHost?.SendKeyEvent(new CefKeyEvent
-            {
-                EventType = CefKeyEventType.KeyUp,
-                WindowsKeyCode = (int)e.KeyCode,
-                Modifiers = GetKeyboardModifiers(e.Modifiers)
-            });
-        }
-
-        protected override void OnKeyPress(KeyPressEventArgs e)
-        {
-            e.Handled = true;
-
-            BrowserHost?.SendKeyEvent(new CefKeyEvent
-            {
-                EventType = CefKeyEventType.Char,
-                WindowsKeyCode = (int)e.KeyChar,
-                FocusOnEditableField = true,
-                Character = e.KeyChar
-            });
-            ;
-        }
-
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
-            var pt = e.Location;
-
-            GetPointInCurrentView(ref pt);
-
-            BrowserHost?.SendMouseMoveEvent(new CefMouseEvent(pt.X, pt.Y, GetMouseModifiers(e.Button)), false);
-        }
-
-        protected override void OnMouseLeave(EventArgs e)
-        {
-            BrowserHost?.SendMouseMoveEvent(new CefMouseEvent(0, 0, CefEventFlags.None), true);
-        }
-
-        protected override void OnMouseDown(MouseEventArgs e)
-        {
-            var pt = e.Location;
-
-            GetPointInCurrentView(ref pt);
-
-            CefMouseButtonType buttonType;
-
-            switch (e.Button)
-            {
-                case MouseButtons.Right:
-                    buttonType = CefMouseButtonType.Right;
-                    break;
-                case MouseButtons.Middle:
-                    buttonType = CefMouseButtonType.Middle;
-                    break;
-                default:
-                    buttonType = CefMouseButtonType.Left;
-                    break;
+                SetWindowPos(hWnd, HWND.NULL, 0, 0, 0, 0, SetWindowPosFlags.SWP_NOZORDER | SetWindowPosFlags.SWP_NOOWNERZORDER | SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOSIZE | SetWindowPosFlags.SWP_FRAMECHANGED);
+                //WindowUtils.EnableAcrylic(this);
             }
-
-            BrowserHost?.SendMouseClickEvent(new CefMouseEvent(pt.X, pt.Y, GetMouseModifiers(e.Button)), buttonType, false, e.Clicks);
-            BrowserHost?.SendFocusEvent(true);
-        }
-
-        protected override void OnMouseUp(MouseEventArgs e)
-        {
-            var pt = e.Location;
-
-            GetPointInCurrentView(ref pt);
-
-            CefMouseButtonType buttonType;
-
-            switch (e.Button)
+            catch (Exception ex)
             {
-                case MouseButtons.Right:
-                    buttonType = CefMouseButtonType.Right;
-                    break;
-                case MouseButtons.Middle:
-                    buttonType = CefMouseButtonType.Middle;
-                    break;
-                default:
-                    buttonType = CefMouseButtonType.Left;
-                    break;
+                WinFormium.GetLogger().Error(ex);
             }
-
-            BrowserHost?.SendMouseClickEvent(new CefMouseEvent(pt.X, pt.Y, GetMouseModifiers(e.Button)), buttonType, true, e.Clicks);
         }
 
-        protected override void OnSizeChanged(EventArgs e)
+        private void AdjustWindowRect(ref RECT rect, WindowStyles style, WindowStylesEx exStyle)
         {
-            base.OnSizeChanged(e);
-            BrowserHost?.WasResized();
+            if (DpiHelper.IsPerMonitorV2Awareness)
+            {
+                AdjustWindowRectExForDpi(ref rect, style, false, exStyle, (uint)DpiHelper.GetDpiForWindow(hWnd));
+            }
+            else
+            {
+                AdjustWindowRectEx(ref rect, style, false, exStyle);
+            }
         }
-
-        protected override void OnMouseWheel(MouseEventArgs e)
+        internal Padding GetNonClientAeraBorders()
         {
-            var pt = ScreenToWindow(e.Location);
+            var rect = RECT.Empty;
 
-            GetPointInCurrentView(ref pt);
+            var screenRect = ClientRectangle;
 
-            BrowserHost?.SendMouseWheelEvent(new CefMouseEvent(pt.X, pt.Y, GetMouseModifiers(e.Button)), 0, e.Delta);
+            screenRect.Offset(-Bounds.Left, -Bounds.Top);
 
+            rect.top = screenRect.Top;
+            rect.left = screenRect.Left;
+            rect.bottom = screenRect.Bottom;
+            rect.right = screenRect.Right;
 
+            AdjustWindowRect(ref rect, (WindowStyles)CreateParams.Style, (WindowStylesEx)CreateParams.ExStyle);
 
+            return new Padding
+            {
+                Top = screenRect.Top - rect.top,
+                Left = screenRect.Left - rect.left,
+                Bottom = rect.bottom - screenRect.Bottom,
+                Right = rect.right - screenRect.Right
+            };
         }
 
-        protected override void OnLostFocus(EventArgs e)
+
+        public HitTestValues HitTest(Point point)
         {
-            BrowserHost?.SendFocusEvent(false);
+            return HitTestValues.HTNOWHERE;
         }
-
-        protected override void OnGotFocus(EventArgs e)
-        {
-            BrowserHost?.SendFocusEvent(true);
-        }
-        #endregion
-
-
-
-
-
-
-        protected override void OnPaintBackground(PaintEventArgs e)
-        {
-            //base.OnPaintBackground(e);
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            //base.OnPaint(e);
-            BrowserHost?.Invalidate(CefPaintElementType.View);
-        }
-
-
-
-        
-
     }
 }

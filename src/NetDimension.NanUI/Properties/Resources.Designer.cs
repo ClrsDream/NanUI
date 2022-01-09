@@ -19,7 +19,7 @@ namespace NetDimension.NanUI.Properties {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -47,8 +47,8 @@ namespace NetDimension.NanUI.Properties {
         }
         
         /// <summary>
-        ///   重写当前线程的 CurrentUICulture 属性
-        ///   重写当前线程的 CurrentUICulture 属性。
+        ///   重写当前线程的 CurrentUICulture 属性，对
+        ///   使用此强类型资源类的所有资源查找执行重写。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Globalization.CultureInfo Culture {
@@ -69,7 +69,7 @@ namespace NetDimension.NanUI.Properties {
         ///  ██║╚██╗██║██╔══██║██║╚██╗██║██║   ██║██║  
         ///  ██║ ╚████║██║  ██║██║ ╚████║╚██████╔╝██║  
         ///  ╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  
-        ///                            S.I.N.C.E 2016  
+        ///                            S.I.N.C.E 2012  
         ///                                             的本地化字符串。
         /// </summary>
         internal static string ASCII_NanUI_Logo {
@@ -99,65 +99,29 @@ namespace NetDimension.NanUI.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap DropShadow {
-            get {
-                object obj = ResourceManager.GetObject("DropShadow", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap GlowShadow {
-            get {
-                object obj = ResourceManager.GetObject("GlowShadow", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 var Formium = Formium || {};
-        ///
-        ///(function ($this) {
-        ///
+        ///   查找类似 
+        ///function WinFormium() {
         ///    const CMD_ATTR_PREFIX = &quot;formium-command&quot;;
-        ///
         ///    const RAISE_FUNC_NAME = &quot;__formium_raiseHostWindowEvent&quot;;
-        ///
         ///    const GLOBAL_CLICK_HANDLER_REGISTERED =
         ///        &quot;__formium_global_click_handler_registered&quot;;
         ///
+        ///    let isDocumentReady = false;
+        ///    let isContextReady = false;
         ///
-        ///    let isV8Ready = false;
+        ///    const readyCallbacks = [];
+        ///    const contextReadyCallbacks = [];
         ///
-        ///    let isDomReady = false;
+        ///    class WinFormium {
         ///
-        ///    const readyFunctions = [];
+        ///        __setContextReady__() {
         ///
-        ///    const contextReadyFunctions = [];
-        ///
-        ///    $this._setContextReady =  () =&gt; {
-        ///
-        ///        isV8Ready = true;
-        ///
-        ///        if (!window.hasOwnPropert [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            while (contextReadyCallbacks.length &gt; 0) {
+        ///               [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
-        internal static string HostWindowJavaScriptExtension {
+        internal static string FormiumWindowBinding {
             get {
-                return ResourceManager.GetString("HostWindowJavaScriptExtension", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] Licenses {
-            get {
-                object obj = ResourceManager.GetObject("Licenses", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("FormiumWindowBinding", resourceCulture);
             }
         }
         
@@ -167,46 +131,6 @@ namespace NetDimension.NanUI.Properties {
         internal static System.Drawing.Bitmap Powered {
             get {
                 object obj = ResourceManager.GetObject("Powered", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap RoundedDropShadow {
-            get {
-                object obj = ResourceManager.GetObject("RoundedDropShadow", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap RoundedGlowShadow {
-            get {
-                object obj = ResourceManager.GetObject("RoundedGlowShadow", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap RoundedShadow {
-            get {
-                object obj = ResourceManager.GetObject("RoundedShadow", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap Shadow {
-            get {
-                object obj = ResourceManager.GetObject("Shadow", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

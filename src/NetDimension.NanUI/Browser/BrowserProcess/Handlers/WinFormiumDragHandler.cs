@@ -1,96 +1,81 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using Xilium.CefGlue;
 
-namespace NetDimension.NanUI.Browser
+namespace NetDimension.NanUI.Browser;
+
+internal sealed class WinFormiumDragHandler : CefDragHandler
 {
-    internal sealed class WinFormiumDragHandler : CefDragHandler
+    private readonly Formium _owner;
+
+    private WinFormiumDragHandler() { }
+
+    internal WinFormiumDragHandler(Formium owner)
     {
-        private readonly Formium _owner;
+        _owner = owner;
+    }
 
+    protected override bool OnDragEnter(CefBrowser browser, CefDragData dragData, CefDragOperationsMask mask)
+    {
+        var e = new DragEnterEventArgs(dragData, mask);
 
+        _owner.InvokeIfRequired(() => _owner.OnDragEnter(e));
 
+        return e.Handled;
+    }
 
-
-        private WinFormiumDragHandler() { }
-
-        internal WinFormiumDragHandler(Formium owner)
+    protected override void OnDraggableRegionsChanged(CefBrowser browser, CefFrame frame, CefDraggableRegion[] regions)
+    {
+        if (_owner.WebView.DraggableRegion != null)
         {
-            _owner = owner;
-
+            _owner.WebView.DraggableRegion.Dispose();
+            _owner.WebView.DraggableRegion = null;
         }
 
-
-        protected override bool OnDragEnter(CefBrowser browser, CefDragData dragData, CefDragOperationsMask mask)
+        if (regions.Length > 0)
         {
-            var e = new DragEnterEventArgs(dragData, mask);
 
-            _owner.InvokeIfRequired(() => _owner.OnDragEnter(e));
+            var scaleFactor = DpiHelper.GetScaleFactorForWindow(_owner.HostWindowHandle);
+            //DpiHelper.GetScaleFactorForCurrentWindow(_owner.WebView.BrowserHost.GetWindowHandle());
 
-            return e.Handled;
-        }
+            //var targetRegion = _core.DraggableRegion = new Region();
 
-        protected override void OnDraggableRegionsChanged(CefBrowser browser, CefFrame frame, CefDraggableRegion[] regions)
-        {
-            if (_owner.WebView.DraggableRegion != null)
+            foreach (var region in regions)
             {
-                _owner.WebView.DraggableRegion.Dispose();
-                _owner.WebView.DraggableRegion = null;
-            }
+                var rect = new Rectangle((int)(region.Bounds.X * scaleFactor), (int)(region.Bounds.Y * scaleFactor), (int)(region.Bounds.Width * scaleFactor), (int)(region.Bounds.Height * scaleFactor));
 
-            if(regions.Length > 0)
-            {
-
-                var scaleFactor = DpiHelper.GetScaleFactorForCurrentWindow(_owner.WebView.BrowserHost.GetWindowHandle());
-                //DpiHelper.GetScaleFactorForCurrentWindow(_owner.WebView.BrowserHost.GetWindowHandle());
-
-
-                //var targetRegion = _core.DraggableRegion = new Region();
-
-
-                foreach (var region in regions)
+                if (_owner.WebView.DraggableRegion == null)
                 {
-                    var rect = new Rectangle((int)(region.Bounds.X * scaleFactor), (int)(region.Bounds.Y * scaleFactor), (int)(region.Bounds.Width * scaleFactor), (int)(region.Bounds.Height * scaleFactor));
+                    _owner.WebView.DraggableRegion = new Region(rect);
+                }
+                else
+                {
 
-                    if(_owner.WebView.DraggableRegion == null)
+                    if (region.Draggable)
                     {
-                        _owner.WebView.DraggableRegion = new Region(rect);
+                        _owner.WebView.DraggableRegion.Union(rect);
                     }
                     else
                     {
-
-                        if (region.Draggable)
-                        {
-                            _owner.WebView.DraggableRegion.Union(rect);
-                        }
-                        else
-                        {
-                            _owner.WebView.DraggableRegion.Exclude(rect);
-                        }
+                        _owner.WebView.DraggableRegion.Exclude(rect);
                     }
-
                 }
+
             }
-            
         }
-    }
 
-    public class DragEnterEventArgs : EventArgs
+    }
+}
+
+public class DragEnterEventArgs : EventArgs
+{
+    internal DragEnterEventArgs(CefDragData dragData, CefDragOperationsMask mask)
     {
-
-
-        internal DragEnterEventArgs(CefDragData dragData, CefDragOperationsMask mask)
-        {
-            DragData = dragData;
-            Mask = mask;
-        }
-
-        public bool Handled { get; set; } = false;
-
-        public CefDragData DragData { get; }
-        public CefDragOperationsMask Mask { get; }
+        DragData = dragData;
+        Mask = mask;
     }
+
+    public bool Handled { get; set; } = false;
+
+    public CefDragData DragData { get; }
+
+    public CefDragOperationsMask Mask { get; }
 }

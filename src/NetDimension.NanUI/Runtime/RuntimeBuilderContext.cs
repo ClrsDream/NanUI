@@ -1,18 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
+namespace NetDimension.NanUI;
 
-namespace NetDimension.NanUI
+public sealed class RuntimeBuilderContext
 {
-    public class RuntimeBuilderContext
+    public IDictionary<object, object> Properties { get; }
+
+    internal RuntimeBuilderContext(IDictionary<object, object> properties)
     {
-
-        public IDictionary<object, object> Properties { get; }
-
-
-        internal RuntimeBuilderContext(IDictionary<object, object> properties)
-        {
-            Properties = properties;
-        }
+        Properties = properties;
     }
 }

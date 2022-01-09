@@ -1,141 +1,157 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xilium.CefGlue;
 
-namespace NetDimension.NanUI.Browser
+namespace NetDimension.NanUI.Browser;
+
+internal sealed class WinFormiumDisplayHandler : CefDisplayHandler
 {
-    internal sealed class WinFormiumDisplayHandler : CefDisplayHandler
+    private Formium _owner;
+
+    public WinFormiumDisplayHandler(Formium owner)
     {
-        private Formium _owner;
+        _owner = owner;
+    }
 
-        public WinFormiumDisplayHandler(Formium owner)
-        {
-            _owner = owner;
-        }
-
-        protected override void OnAddressChange(CefBrowser browser, CefFrame frame, string url)
-        {
+    protected override void OnAddressChange(CefBrowser browser, CefFrame frame, string url)
+    {
 
 
-            var e = new AddressChangedEventArgs(frame, url);
+        var e = new AddressChangedEventArgs(frame, url);
 
 
-            _owner.InvokeIfRequired(() => _owner.OnAddressChanged(e));
+        _owner.InvokeIfRequired(() => _owner.OnAddressChanged(e));
 
-
-        }
-
-        protected override bool OnConsoleMessage(CefBrowser browser, CefLogSeverity level, string message, string source, int line)
-        {
-            var e = new ConsoleMessageEventArgs(level, message, source, line);
-
-            _owner.InvokeIfRequired(() => _owner.OnConsoleMessage(e));
-
-            return e.Handled;
-
-        }
-
-        protected override void OnFullscreenModeChange(CefBrowser browser, bool fullscreen)
-        {
-            var e = new FullScreenModeChangedEventArgs(fullscreen);
-            _owner.InvokeIfRequired(()=> _owner.OnFullscreenModeChanged(e));
-        }
-
-        protected override void OnLoadingProgressChange(CefBrowser browser, double progress)
-        {
-            var e = new LoadingProgressChangedEventArgs(progress);
-
-
-            _owner.InvokeIfRequired(() => _owner.OnLoadingProgressChanged(e));
-
-        }
-
-        protected override void OnStatusMessage(CefBrowser browser, string value)
-        {
-            var e = new StatusMessageEventArgs(value);
-
-            _owner.InvokeIfRequired(() => _owner.OnStatusMessage(e));
-
-        }
-
-        protected override void OnTitleChange(CefBrowser browser, string title)
-        {
-            var e = new DocumentTitleChangedEventArgs(title);
-
-            _owner.InvokeIfRequired(() => _owner.OnDocumentTitleChanged(e));
-
-        }
 
     }
 
-    public sealed class AddressChangedEventArgs : EventArgs
+    protected override bool OnConsoleMessage(CefBrowser browser, CefLogSeverity level, string message, string source, int line)
     {
-        internal AddressChangedEventArgs(CefFrame frame, string url)
-        {
-            Frame = frame;
-            Url = url;
-        }
+        var e = new ConsoleMessageEventArgs(level, message, source, line);
 
-        public CefFrame Frame { get; }
-        public string Url { get; }
+        _owner.InvokeIfRequired(() => _owner.OnConsoleMessage(e));
+
+        return e.Handled;
+
     }
 
-    public sealed class ConsoleMessageEventArgs : EventArgs
+    protected override void OnFullscreenModeChange(CefBrowser browser, bool fullscreen)
     {
-        internal ConsoleMessageEventArgs(CefLogSeverity level, string message, string source, int line)
-        {
-            Level = level;
-            Message = message;
-            Source = source;
-            Line = line;
-        }
-
-        public CefLogSeverity Level { get; }
-        public string Message { get; }
-        public string Source { get; }
-        public int Line { get; }
-
-        public bool Handled { get; set; }
+        var e = new FullScreenModeChangedEventArgs(fullscreen);
+        _owner.InvokeIfRequired(() => _owner.OnFullscreenModeChanged(e));
     }
 
-    public sealed class FullScreenModeChangedEventArgs: EventArgs
+    protected override void OnLoadingProgressChange(CefBrowser browser, double progress)
     {
-        internal FullScreenModeChangedEventArgs(bool fullscreen)
-        {
-            Fullscreen = fullscreen;
-        }
+        var e = new LoadingProgressChangedEventArgs(progress);
 
-        public bool Fullscreen { get; }
+
+        _owner.InvokeIfRequired(() => _owner.OnLoadingProgressChanged(e));
+
     }
 
-    public sealed class LoadingProgressChangedEventArgs : EventArgs
+    protected override void OnStatusMessage(CefBrowser browser, string value)
     {
-        internal LoadingProgressChangedEventArgs(double progress)
-        {
-            Progress = progress;
-        }
+        var e = new StatusMessageEventArgs(value);
 
-        public double Progress { get; }
+        _owner.InvokeIfRequired(() => _owner.OnStatusMessage(e));
+
     }
 
-    public sealed class StatusMessageEventArgs : EventArgs
+    protected override void OnTitleChange(CefBrowser browser, string title)
     {
-        internal StatusMessageEventArgs(string messageText)
-        {
-            MessageText = messageText;
-        }
+        var e = new DocumentTitleChangedEventArgs(title);
 
-        public string MessageText { get; }
+        _owner.InvokeIfRequired(() => _owner.OnDocumentTitleChanged(e));
+
     }
 
-    public sealed class DocumentTitleChangedEventArgs : EventArgs
+
+    //protected override void OnCursorChange(CefBrowser browser, IntPtr cursorHandle, CefCursorType type, CefCursorInfo customCursorInfo)
+    //{
+    //    _owner.InvokeIfRequired(() => _owner.HostWindowInternal.Cursor = new Cursor(cursorHandle));
+
+    //}
+
+    protected override bool OnCursorChange(CefBrowser browser, IntPtr cursorHandle, CefCursorType type, CefCursorInfo customCursorInfo)
     {
-        internal DocumentTitleChangedEventArgs(string title)
+        if (_owner.WindowType == HostWindow.HostWindowType.Layered)
         {
-            Title = title;
+            _owner.InvokeIfRequired(() => _owner.FormHostWindow.Cursor = new Cursor(cursorHandle));
+
+            return true;
         }
 
-        public string Title { get; }
+        return false;
+
     }
+
+}
+
+public sealed class AddressChangedEventArgs : EventArgs
+{
+    internal AddressChangedEventArgs(CefFrame frame, string url)
+    {
+        Frame = frame;
+        Url = url;
+    }
+
+    public CefFrame Frame { get; }
+    public string Url { get; }
+}
+
+public sealed class ConsoleMessageEventArgs : EventArgs
+{
+    internal ConsoleMessageEventArgs(CefLogSeverity level, string message, string source, int line)
+    {
+        Level = level;
+        Message = message;
+        Source = source;
+        Line = line;
+    }
+
+    public CefLogSeverity Level { get; }
+    public string Message { get; }
+    public string Source { get; }
+    public int Line { get; }
+
+    public bool Handled { get; set; }
+}
+
+public sealed class FullScreenModeChangedEventArgs : EventArgs
+{
+    internal FullScreenModeChangedEventArgs(bool fullscreen)
+    {
+        Fullscreen = fullscreen;
+    }
+
+    public bool Fullscreen { get; }
+}
+
+public sealed class LoadingProgressChangedEventArgs : EventArgs
+{
+    internal LoadingProgressChangedEventArgs(double progress)
+    {
+        Progress = progress;
+    }
+
+    public double Progress { get; }
+}
+
+public sealed class StatusMessageEventArgs : EventArgs
+{
+    internal StatusMessageEventArgs(string messageText)
+    {
+        MessageText = messageText;
+    }
+
+    public string MessageText { get; }
+}
+
+public sealed class DocumentTitleChangedEventArgs : EventArgs
+{
+    internal DocumentTitleChangedEventArgs(string title)
+    {
+        Title = title;
+    }
+
+    public string Title { get; }
 }

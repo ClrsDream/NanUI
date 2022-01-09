@@ -1,34 +1,48 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using System.Threading;
-using System.Windows.Forms;
+using static Vanara.PInvoke.User32;
 
-namespace NetDimension.NanUI.HostWindow
+namespace NetDimension.NanUI.HostWindow;
+
+public enum HostWindowType
 {
-    public enum HostWindowType
-    {
-        System,
-        Borderless,
-        Kiosk,
-        Layered,
-        Acrylic,
-        Custom
-    }
+    /// <summary>
+    /// System default style
+    /// </summary>
+    System,
+    /// <summary>
+    /// System borderless style with DWM
+    /// </summary>
+    SystemBorderless,
+    /// <summary>
+    /// Customable borderless window style
+    /// </summary>
+    Borderless,
+    /// <summary>
+    /// Fullscreen style
+    /// </summary>
+    Kiosk,
+    /// <summary>
+    /// Layerd window style
+    /// </summary>
+    Layered,
+    ///// <summary>
+    ///// Acrylic background style
+    ///// </summary>
+    //Acrylic,
+    /// <summary>
+    /// Use your own window style
+    /// </summary>
+    Custom
+}
 
-    public delegate bool OnWindowsMessageDelegate(ref Message message);
 
 
-    public interface IFormiumHostWindow
-    {
-        void PostUIThread(Action action);
+public interface IFormiumHostWindow
+{
 
-        OnWindowsMessageDelegate OnWindowsMessage { get; set; }
+    WindowMessageDelegate OnWindowsMessage { get; set; }
 
-        OnWindowsMessageDelegate OnDefWindowsMessage { get; set; }
+    WindowMessageDelegate OnDefWindowsMessage { get; set; }
 
-    }
-
+    HitTestValues HitTest(Point point);
 
 }
